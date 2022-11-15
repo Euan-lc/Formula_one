@@ -1,0 +1,1 @@
+void display_scores(car *circuit, int car_count){
