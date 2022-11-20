@@ -12,3 +12,11 @@
 void bubble_sort(car *list, int car_count);
 
 void best_sector(car *list, int car_count);
+
+float genTime(float lower, float upper);
+
+void init_car(car *ptr, int carId);
+
+void lap_car(car *ptr);
+
+void display_scores(car *circuit, int car_count);

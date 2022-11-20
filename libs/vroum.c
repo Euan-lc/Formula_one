@@ -28,14 +28,3 @@ void lap_car(car *ptr){
     if(lap < ptr->best_lap)ptr->best_lap = lap;
     ptr->total_time = ptr->total_time + lap;
 }
-
-void race_cars(car *ptr, int num_laps, int lap_time){
-    int i = 0;
-    while(i < num_laps){
-        for (int i = 0; i < NUM_CARS; i++){
-            lap_car(&ptr[i]);
-        }
-        sleep(lap_time);
-        i += 1;
-    }
-}
