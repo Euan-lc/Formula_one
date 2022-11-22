@@ -1,6 +1,7 @@
 #include "f1.h"
 
 void bubble_sort(car *list, int car_count){
+    //TODO: optimise
     car buffer;
     int count, count2;
 

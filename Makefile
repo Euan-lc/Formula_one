@@ -1,4 +1,4 @@
-all: main.c libs/car.h libs/display.c libs/vroum.c libs/sort.c
+main: main.c libs/car.h libs/display.c libs/vroum.c libs/sort.c
 	gcc libs/display.c -c
 	gcc libs/sort.c -c
 	gcc libs/vroum.c -c

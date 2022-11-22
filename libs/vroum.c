@@ -15,6 +15,7 @@ void init_car(car *ptr, int carId) {
     ptr->has_best_s3 = 0;
 }
 void lap_car(car *ptr){
+    //TODO: pit stop / crash
     float lap;
 
     ptr->s1 = genTime(25,45);

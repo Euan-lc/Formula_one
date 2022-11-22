@@ -1,16 +1,14 @@
 #include "libs/f1.h"
 
-//TODO: fix display only updating time once
 //TODO: different behaviour based on type of race (Q1-3, P1-3, s)
+//  TODO: starting cars based on results
 //TODO: saving results to csv
-//TODO: starting cars based on results
+//TODO: concurrence
+//TODO: pit stop/crash
 
 void main(int argc, char *argv[]) {
     int shmid, cpid, num_cars, shmkey = 420;
     num_cars = atoi(argv[1]);
-
-    //generate seed for rand
-    srand48(time(0));
 
     //display
     initscr();
@@ -28,12 +26,17 @@ void main(int argc, char *argv[]) {
     }
 
     for (int i = 0; i < num_cars; i++) {
-        if (fork() == 0) {
+        if ((cpid = fork()) == 0) {
             car child;
             child = circuit[i];
+
+            //generate seed for rand based on
+            srand48(time(0) + child.id);
+
             //printf("[son] pid %d from [parent] pid %d and car id is %d\n", getpid(), getppid(), child.id);
-            for(int i = 0; i < 20; i++){
-                sleep(0.25);
+            for(int j = 0; j < 20; j++){
+                sleep(1);
+                //circuit[i].s1 = j;
                 lap_car(&circuit[i]);
             }
             //printf("car %d has a lap time of %g\n", child.id, child.total_time);
@@ -41,26 +44,31 @@ void main(int argc, char *argv[]) {
         }
     }
 
-    halfdelay(5);
-    for(int i = 0; i < 10; i++) {
-        //car * buffer = malloc(num_cars * sizeof(car));
-        //memcpy(buffer,circuit,num_cars * sizeof(car));
-        //bubble_sort(buffer, num_cars);
+    if(cpid != 0){
+        halfdelay(5);
+        for(int i = 0; i < 50; i++) {
+            car * buffer = malloc(num_cars * sizeof(car));
+            memcpy(buffer,circuit,num_cars * sizeof(car));
+            bubble_sort(buffer, num_cars);
+            printw("%d\n", i);
+            display_scores(buffer, num_cars);
 
-        display_scores(circuit, num_cars);
+            getch();
+            erase();
+            refresh();
+        }
 
+        //shared memory
+        shmctl(shmid, IPC_RMID, NULL);
+
+        //display
         getch();
-        erase();
-        refresh();
+        endwin();
     }
 
-    //shared memory
-    shmctl(shmid, IPC_RMID, NULL);
-    shmdt(circuit);
 
-    //display
-    getch();
-    endwin();
+    //shared memory
+    shmdt(circuit);
 
     exit(0);
 }
