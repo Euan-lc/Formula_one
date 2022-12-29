@@ -29,7 +29,7 @@ void init_car(car *ptr, int carId) {
     ptr->state_pitstop_crash = false;
 }
 void lap_car(car *ptr){
-    //TODO: pit stop / crash
+    //TODO: pit stop / crash all cars pit at same time, no crashing implemented
     float lap;
 
     if (probability(0.25)){
