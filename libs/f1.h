@@ -20,3 +20,5 @@ void init_car(car *ptr, int carId);
 void lap_car(car *ptr);
 
 void display_scores(car *circuit, int car_count);
+
+void write_to_file(char* filename, char* mode, char* separator, int num_cars, car *bracket);

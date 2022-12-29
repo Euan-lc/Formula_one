@@ -46,7 +46,7 @@ void main(int argc, char *argv[]) {
 
     if(cpid != 0){
         halfdelay(5);
-        for(int i = 0; i < 50; i++) {
+        for(int i = 0; i < 20; i++) {
             car * buffer = malloc(num_cars * sizeof(car));
             memcpy(buffer,circuit,num_cars * sizeof(car));
             bubble_sort(buffer, num_cars);
@@ -66,6 +66,7 @@ void main(int argc, char *argv[]) {
         endwin();
     }
 
+    write_to_file("test.csv", "w", ";", num_cars, circuit);
 
     //shared memory
     shmdt(circuit);
