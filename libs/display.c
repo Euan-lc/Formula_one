@@ -16,7 +16,7 @@ void display_scores(car *circuit, int car_count){
         if (circuit[i].has_best_s3)attron(COLOR_PAIR(1));
         printw("%-5.4g", circuit[i].s3);
         if (circuit[i].has_best_s3)attroff(COLOR_PAIR(1));
-        printw(" | %-5.4g\n", circuit[i].best_lap);
-        printw(" | %B\n", circuit[i].state_pitstop_crash);
+        printw(" | %-5.4g", circuit[i].best_lap);
+        printw(" | %s\n", circuit[i].state_pitstop_crash ? "true" : "false");
     }
 }

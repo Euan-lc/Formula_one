@@ -1,8 +1,8 @@
 #include "libs/f1.h"
 
 //TODO: different behaviour based on type of race (Q1-3, P1-3, s)
-//  TODO: starting cars based on results
 //TODO: saving results to csv
+//TODO: starting cars based on results
 //TODO: concurrence
 //TODO: pit stop/crash
 
