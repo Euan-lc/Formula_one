@@ -5,6 +5,7 @@
 //TODO: saving results to csv
 //TODO: concurrence
 //TODO: pit stop/crash
+//TODO: add error handling/generating
 
 void main(int argc, char *argv[]) {
     int shmid, cpid, num_cars, shmkey = 420;
