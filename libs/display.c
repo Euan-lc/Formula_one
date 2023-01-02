@@ -1,7 +1,7 @@
 #include "f1.h"
 
 void display_scores(car *circuit, int car_count){
-    printw("| id |   s1  |   s2  |   s3  |  lap  | pitstop/crash \n|----|-------|-------|-------|-------|---------------\n");
+    printw("| id |   s1  |   s2  |   s3  |  lap  | pitstop | crash \n|----|-------|-------|-------|-------|---------------\n");
 
     for (int i = 0; i < car_count; i++) {
         printw("| %2d | ", circuit[i].id);
@@ -18,5 +18,6 @@ void display_scores(car *circuit, int car_count){
         if (circuit[i].has_best_s3)attroff(COLOR_PAIR(1));
         printw(" | %-5.4g", circuit[i].best_lap);
         printw(" | %s\n", circuit[i].state_pitstop ? "true" : "false");
+        printw(" | %s\n", circuit[i].state_crash ? "true" : "false");
     }
 }
