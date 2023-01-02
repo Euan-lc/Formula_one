@@ -15,14 +15,6 @@ void main(int argc, char *argv[]) {
     printf("  -sunday     start the sunday race (300-3500 km)\n");
     return 0;
     }
-    // open the file in read mode
-    FILE *file = fopen("data.csv", "r");
-
-    // Check if the file was opened successfully if not create it
-    if (file == NULL) {
-        FILE *file = fopen("data.csv", "w");
-    }
-    fclose(file);
     
     int shmid, cpid, num_cars, shmkey = 420;
     num_cars = atoi(argv[1]);
