@@ -7,13 +7,22 @@
 //TODO: pit stop/crash
 
 void main(int argc, char *argv[]) {
-    // Open the file for writing
+    if (argc > 1 && strcmp(argv[1], "-h") == 0) {
+    // Print the help message
+    printf("Usage: Formula_one [OPTION]\n");
+    printf("  -h     display this help message\n");
+    printf("  -sprint     start the sprint race (100-120 km)\n");
+    printf("  -sunday     start the sunday race (300-3500 km)\n");
+    return 0;
+    }
+    // open the file in read mode
     FILE *file = fopen("data.csv", "r");
 
     // Check if the file was opened successfully if not create it
     if (file == NULL) {
         FILE *file = fopen("data.csv", "w");
     }
+    fclose(file);
     
     int shmid, cpid, num_cars, shmkey = 420;
     num_cars = atoi(argv[1]);
