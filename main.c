@@ -5,6 +5,7 @@
 //TODO: starting cars based on results
 //TODO: concurrence
 //TODO: pit stop/crash
+//TODO: add error handling/generating
 
 void main(int argc, char *argv[]) {
     if (argc > 1 && strcmp(argv[1], "-h") == 0) {
@@ -55,7 +56,7 @@ void main(int argc, char *argv[]) {
 
     if(cpid != 0){
         halfdelay(5);
-        for(int i = 0; i < 50; i++) {
+        for(int i = 0; i < 20; i++) {
             car * buffer = malloc(num_cars * sizeof(car));
             memcpy(buffer,circuit,num_cars * sizeof(car));
             bubble_sort(buffer, num_cars);
@@ -75,6 +76,7 @@ void main(int argc, char *argv[]) {
         endwin();
     }
 
+    write_to_file("p1","test.csv", "w", ";", num_cars, circuit);
 
     //shared memory
     shmdt(circuit);
