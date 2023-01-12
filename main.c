@@ -1,13 +1,22 @@
 #include "libs/f1.h"
 
 //TODO: different behaviour based on type of race (Q1-3, P1-3, s)
-//  TODO: starting cars based on results
 //TODO: saving results to csv
+//TODO: starting cars based on results
 //TODO: concurrence
 //TODO: pit stop/crash
 //TODO: add error handling/generating
 
 void main(int argc, char *argv[]) {
+    if (argc > 1 && strcmp(argv[1], "-h") == 0) {
+    // Print the help message
+    printf("Usage: Formula_one [OPTION]\n");
+    printf("  -h     display this help message\n");
+    printf("  -sprint     start the sprint race (100-120 km)\n");
+    printf("  -sunday     start the sunday race (300-3500 km)\n");
+    return 0;
+    }
+    
     int shmid, cpid, num_cars, shmkey = 420;
     num_cars = atoi(argv[1]);
 
