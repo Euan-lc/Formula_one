@@ -32,46 +32,12 @@ void init_car(car *ptr, int carId) {
 void lap_car(car *ptr){
     //TODO: pit stop / crash all cars pit at same time, no crashing implemented
     float lap;
-    if (probability(0.25) || ptr->state_crash == false){
-        if (probability(0.10)){
-            ptr->state_crash = true;
-        }
-        ptr->s1 = genTime(25,45) + 20;
-        ptr->state_pitstop = true;
-    }
-    else{
-        if (probability(0.10) || ptr->state_crash == false){
-            ptr->state_crash = true;
-        }
-         ptr->s1 = genTime(25,45);
-    }
-    if (probability(0.25) || ptr->state_crash == false){
-        if (probability(0.10)){
-            ptr->state_crash = true;
-        }
-        ptr->s2 = genTime(25,45) + 20;
-        ptr->state_pitstop = true;
-    }
-    else{
-        if (probability(0.10)){
-            ptr->state_crash = true;
-        }
-        ptr->s2 = genTime(25,45);
-    }
-    if (probability(0.25) || ptr->state_crash == false){
-        if (probability(0.10)){
-            ptr->state_crash = true;
-        }
-        ptr->s3 = genTime(25,45) + 20;
-        ptr->state_pitstop = true;
-    }
-    else{
-        if (probability(0.10)){
-            ptr->state_crash = true;
-        }
-        ptr->s3 = genTime(25,45);
-    }
+ 
+    ptr->s1 = genTime(25,45);
+    ptr->s2 = genTime(25,45);
+    ptr->s3 = genTime(25,45);
     lap = ptr->s1 + ptr->s2 + ptr->s3;
+    
 
     if(ptr->s1 < ptr->best_s1)ptr->best_s1 = ptr->s1;
     if(ptr->s2 < ptr->best_s2)ptr->best_s2 = ptr->s2;
