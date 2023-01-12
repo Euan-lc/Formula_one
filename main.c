@@ -67,7 +67,7 @@ void main(int argc, char *argv[]) {
         endwin();
     }
 
-    write_to_file("test.csv", "w", ";", num_cars, circuit);
+    write_to_file("p1","test.csv", "w", ";", num_cars, circuit);
 
     //shared memory
     shmdt(circuit);
