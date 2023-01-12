@@ -7,7 +7,7 @@
 //TODO: pit stop/crash
 //TODO: add error handling/generating
 
-void main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     if (argc > 1 && strcmp(argv[1], "-h") == 0) {
     // Print the help message
     printf("Usage: Formula_one [OPTION]\n");
