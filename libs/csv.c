@@ -5,7 +5,7 @@ void write_to_file(char* race, char* filename, char* mode, char* separator, int 
 
     fpt = fopen(filename, mode);
 
-    fprintf(fpt,"%s\nid%s best s1%s best s2 %s best s3 %s best lap%s total time%s pitstop/crash\n",race, separator, separator, separator, separator, separator, separator);
+    fprintf(fpt,"%s\nid%s best s1%s best s2 %s best s3 %s best lap%s total time\n",race, separator, separator, separator, separator, separator);
 
     for (int i = 0; i < num_cars; i++) {
         fprintf( fpt, "%2d", bracket[i].id);
@@ -20,7 +20,6 @@ void write_to_file(char* race, char* filename, char* mode, char* separator, int 
         fprintf( fpt, "%s", separator);
         fprintf( fpt, "%-5.4g", bracket[i].total_time);
         fprintf( fpt, "%s", separator);
-        fprintf( fpt, "%s\n", bracket[i].state_pitstop_crash ? "true" : "false");
     }
     fprintf(fpt, "\n");
 }
@@ -47,7 +46,8 @@ void fill_car(char line[], char* separator, car *temp) {
     temp->has_best_s1 = 0;
     temp->has_best_s2 = 0;
     temp->has_best_s3 = 0;
-    temp->state_pitstop_crash = false;
+    temp->state_pitstop = false;
+    temp->state_crash = false;
 }
 
 void read_from_file(char* filename, char* separator, char* race, int num_cars, car* bracket) {
