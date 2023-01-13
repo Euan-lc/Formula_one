@@ -13,7 +13,7 @@ bool probability(double p) {
     double r = (double) rand() / RAND_MAX;
 
     // Return true if the random number is less than p
-    return r < p;
+    return (r < p);
 }
 
 void init_car(car *ptr, int carId) {
@@ -32,7 +32,7 @@ void init_car(car *ptr, int carId) {
 void lap_car(car *ptr){
     //TODO: pit stop / crash all cars pit at same time, no crashing implemented
     float lap;
- 
+
     ptr->s1 = genTime(25,45);
     ptr->s2 = genTime(25,45);
     ptr->s3 = genTime(25,45);

@@ -9,12 +9,12 @@
 
 void main(int argc, char *argv[]) {
     if (argc > 1 && strcmp(argv[1], "-h") == 0) {
-    // Print the help message
-    printf("Usage: Formula_one [OPTION]\n");
-    printf("  -h     display this help message\n");
-    printf("  -sprint     start the sprint race (100-120 km)\n");
-    printf("  -sunday     start the sunday race (300-3500 km)\n");
-    return 0;
+        //Print the help message
+        printf("Usage: Formula_one [OPTION]\n");
+        printf("  -h     display this help message\n");
+        printf("  -sprint     start the sprint race (100-120 km)\n");
+        printf("  -sunday     start the sunday race (300-3500 km)\n");
+        exit(0);
     }
     
     int shmid, cpid, num_cars, shmkey = 420;
@@ -47,6 +47,9 @@ void main(int argc, char *argv[]) {
             for(int j = 0; j < 20; j++){
                 sleep(1);
                 //circuit[i].s1 = j;
+                if (probability(0.01)){
+                    kill(cpid, SIGKILL);
+                };
                 lap_car(&circuit[i]);
             }
             //printf("car %d has a lap time of %g\n", child.id, child.total_time);

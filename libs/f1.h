@@ -7,6 +7,7 @@
 #include <time.h>
 #include <string.h>
 #include <ncurses.h>
+#include <signal.h>
 #include "car.h"
 
 void bubble_sort(car *list, int car_count);
@@ -22,3 +23,5 @@ void lap_car(car *ptr);
 void display_scores(car *circuit, int car_count);
 
 void write_to_file(char* race, char* filename, char* mode, char* separator, int num_cars, car *bracket);
+
+bool probability(double p);
