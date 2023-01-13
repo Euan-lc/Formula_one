@@ -1,24 +1,34 @@
 #include "libs/f1.h"
 
-//TODO: different behaviour based on type of race (Q1-3, P1-3, s)
-//TODO: saving results to csv
-//TODO: starting cars based on results
-//TODO: concurrence
-//TODO: pit stop/crash
-//TODO: add error handling/generating
+//TODO: help message
+//TODO: .csv creation
+//TODO: check param validity
 
 int main(int argc, char *argv[]) {
     if (argc > 1 && strcmp(argv[1], "-h") == 0) {
     // Print the help message
-    printf("Usage: Formula_one [OPTION]\n");
-    printf("  -h     display this help message\n");
-    printf("  -sprint     start the sprint race (100-120 km)\n");
-    printf("  -sunday     start the sunday race (300-3500 km)\n");
+    printf("Usage: ./Formula_one [weekend] [race_type] [race_number] [num_turns/time]\n\n");
+
+    printf("  -h     display this help message\n\n");
+
+    printf("weekend is the name of the file which will store the race results\n\n");
+
+    printf("race types :\n");
+    printf("  -tryout\n");
+    printf("  -qualifiers\n");
+    printf("  -sprint\n");
+    printf("  -final\n\n");
+    printf("race_number :\n");
+    printf("race_number is for tryout and qualifiers and is from 1 to 3\n\n");
+
+    printf("num_turns :\n");
+    printf("num_turns is for sprint or final and determines the number of turns the cars have to complete.\n");
+
     return 0;
     }
     
     int shmid, cpid, num_cars, shmkey = 420;
-    num_cars = atoi(argv[1]);
+    char *race_name;
 
     //display
     initscr();
@@ -29,11 +39,18 @@ int main(int argc, char *argv[]) {
     shmid = shmget(shmkey, num_cars * sizeof(car), IPC_CREAT | 0666);
     car *circuit = shmat(shmid, 0, 0);
 
-    //printf("%d\n",num_cars);
+    if (argc == 4 && strcmp(argv[2], "-sprint") == 0) {
+        if (strcmp(argv[3], "1") == 0){
+            //create file
+        }
 
-    for (int i = 0; i < num_cars; i++) {
-        init_car(&circuit[i], carIds[i]);
+        race_name = "p" + argv[3];
+        for (int i = 0; i < num_cars; i++) init_car(&circuit[i], carIds[i]);
+
+        //define condition for race finish
     }
+
+
 
     for (int i = 0; i < num_cars; i++) {
         if ((cpid = fork()) == 0) {
@@ -76,7 +93,7 @@ int main(int argc, char *argv[]) {
         endwin();
     }
 
-    write_to_file("p1","test.csv", "w", ";", num_cars, circuit);
+    write_to_file("p1","test.csv", "a", ";", num_cars, circuit);
 
     //shared memory
     shmdt(circuit);
