@@ -1,4 +1,4 @@
-main: main.c libs/car.h libs/display.c libs/vroum.c libs/sort.c
+main: main.c libs/car.h libs/display.c libs/vroum.c libs/sort.c libs/csv.c
 	gcc libs/display.c -c
 	gcc libs/sort.c -c
 	gcc libs/vroum.c -c
@@ -12,3 +12,7 @@ clean:
 	rm -f csv.o
 	rm -f circuit
 	rm -f test.csv
+menu: libs/f1.h menu.c libs/csv.c libs/vroum.c
+	gcc libs/vroum.c -c
+	gcc libs/csv.c -c
+	gcc menu.c csv.o vroum.o -o menu

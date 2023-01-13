@@ -19,9 +19,10 @@ void write_to_file(char* race, char* filename, char* mode, char* separator, int 
         fprintf( fpt, "%-5.4g", bracket[i].best_lap);
         fprintf( fpt, "%s", separator);
         fprintf( fpt, "%-5.4g", bracket[i].total_time);
-        fprintf( fpt, "%s", separator);
+        fprintf( fpt, "\n");
     }
     fprintf(fpt, "\n");
+    fclose( fpt );
 }
 
 void fill_car(char line[], char* separator, car *temp) {
@@ -71,4 +72,31 @@ void read_from_file(char* filename, char* separator, char* race, int num_cars, c
         fill_car(line, separator, &test);
         bracket[i] = test;
     }
+    fclose( fpt );
+}
+
+int * get_order(char* filename, char* separator, char* race, int num_cars) {
+    static int  order[20];
+    FILE *fpt;
+    char line[1024];
+
+
+    fpt = fopen(filename, "r");
+
+    while(fgets(line, 1024, fpt)){
+        char* tmp = strdup(line);
+        const char* tok = strtok(tmp, "\n");
+        if(strcmp(tok,race) == 0){
+            fgets(line, 1024, fpt);
+            break;
+        }
+    }
+
+    for(int i = 0; i < num_cars ; ++i){
+        fgets(line, 1024, fpt);
+        char* tmp = strdup(line);
+        order[i] = atoi(strtok(tmp, separator));
+    }
+    fclose( fpt );
+    return order;
 }

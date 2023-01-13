@@ -24,3 +24,5 @@ void display_scores(car *circuit, int car_count);
 void write_to_file(char* race, char* filename, char* mode, char* separator, int num_cars, car *bracket);
 
 void read_from_file(char* filename, char* separator, char* race, int num_cars, car* bracket);
+
+int * get_order(char* filename, char* separator, char* race, int num_cars);
