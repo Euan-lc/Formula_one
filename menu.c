@@ -7,6 +7,7 @@
 int main(int argc, char *argv[]) {
     char race_name[10];
     char filename[51];
+    char * mode = "a";
     int num_cars = 20;
     car circuit[20];
 
@@ -34,32 +35,37 @@ int main(int argc, char *argv[]) {
 
     if (argc == 4 || strcmp(argv[2], "-tryouts") == 0) {
         if (strcmp(argv[3], "1") == 0) {
-            //create file
+            mode = "w";
         }
 
-        strcat(race_name, "P");
+        strcat(race_name, "S");
         strcat(race_name, argv[3]);
 
-        //        for (int i = 0; i < num_cars; i++) init_car(&circuit[i], carIds[i]);
+        for (int i = 0; i < num_cars; i++) init_car(&circuit[i], carIds[i]);
 
         //define condition for race finish
-    }
-    else if (argc == 4 || strcmp(argv[2], "-qualifiers") == 0) {
+    } else if (argc == 4 || strcmp(argv[2], "-qualifiers") == 0) {
         int *order;
 
         strcat(race_name, "Q");
         strcat(race_name, argv[3]);
-
-        if(strcmp(race_name, "Q2") == 0){
+        if(strcmp(race_name, "Q1") == 0) {
+            num_cars = 20;
+            for (int i = 0; i < num_cars; i++) init_car(&circuit[i], carIds[i]);
+        } else if(strcmp(race_name, "Q2") == 0){
             num_cars = 15;
-            order = get_order(filename, ";", "Q1", 15);
+            order = get_order(filename, ";", "Q1", num_cars);
+            for (int i = 0; i < num_cars; i++) init_car(&circuit[i], *(order + i));
+            read_from_file(filename, ";", "Q1", 20, circuit, 5);
         } else if(strcmp(race_name, "Q3") == 0){
             num_cars = 10;
-            order = get_order(filename, ";", "Q2", 10);
+            order = get_order(filename, ";", "Q2", num_cars);
+            for (int i = 0; i < num_cars; i++) init_car(&circuit[i], *(order + i));
+            read_from_file(filename, ";", "Q1", 20, circuit, 5);
         }
 
         //define condition for race finish
-    }
+    }else if ()
 
 //    for (int i = 0; i < num_cars; i++) {
 //        init_car(&circuit[i], carIds[i]);

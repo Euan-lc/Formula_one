@@ -51,7 +51,7 @@ void fill_car(char line[], char* separator, car *temp) {
     temp->state_crash = false;
 }
 
-void read_from_file(char* filename, char* separator, char* race, int num_cars, car* bracket) {
+void read_from_file(char* filename, char* separator, char* race, int num_cars, car* bracket, int skip) {
     FILE *fpt;
     char line[1024];
     car test;
@@ -67,7 +67,11 @@ void read_from_file(char* filename, char* separator, char* race, int num_cars, c
         }
     }
 
-    for(int i = 0; i < num_cars ; i++){
+    for(int i =0; i < skip; i++){
+        fgets(line, 1024, fpt);
+    }
+
+    for(int i = skip; i < num_cars ; i++){
         fgets(line, 1024, fpt);
         fill_car(line, separator, &test);
         bracket[i] = test;
