@@ -9,7 +9,11 @@ int main(int argc, char *argv[]) {
     char filename[51];
     char * mode = "a";
     int num_cars = 20;
-    car circuit[20];
+
+    //shared memory
+    shmid = shmget(shmkey, num_cars * sizeof(car), IPC_CREAT | 0666);
+    car *circuit = shmat(shmid, 0, 0);
+    int shmid, cpid, num_cars, shmkey = 420;
 
     if (argc > 1 && strcmp(argv[1], "-h") == 0) {
         // Print the help message
@@ -65,18 +69,12 @@ int main(int argc, char *argv[]) {
         }
 
         //define condition for race finish
-    }else if ()
+    }
 
-//    for (int i = 0; i < num_cars; i++) {
-//        init_car(&circuit[i], carIds[i]);
-//    }
-//
-//    write_to_file("p1", "menu.csv", "w", ";", 20, circuit);
-//    printf("name : %s\n", race_name);
-//    int *order;
-//    order = get_order("menu.csv", ";", "p1", 4);
-//    for (int i = 0; i < 4; i++) {
-//
-//        printf("%d, %d\n", i, *(order + i));
-//    }
+    //display
+    initscr();
+    start_color();
+    init_pair(1,COLOR_MAGENTA, COLOR_BLACK);
+
+
 }

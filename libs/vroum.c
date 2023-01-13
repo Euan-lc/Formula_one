@@ -5,16 +5,16 @@ float genTime(float lower, float upper) {
 }
 
 
-bool probability(double p) {
-    // Seed the random number generator with the current time
-    srand(time(0));
-
-    // Generate a random number between 0 and 1
-    double r = (double) rand() / RAND_MAX;
-
-    // Return true if the random number is less than p
-    return r < p;
-}
+//bool probability(double p) {
+//    // Seed the random number generator with the current time
+//    srand(time(0));
+//
+//    // Generate a random number between 0 and 1
+//    double r = (double) rand() / RAND_MAX;
+//
+//    // Return true if the random number is less than p
+//    return r < p;
+//}
 
 void init_car(car *ptr, int carId) {
     ptr->id = carId;
@@ -26,8 +26,8 @@ void init_car(car *ptr, int carId) {
     ptr->has_best_s1 = 0;
     ptr->has_best_s2 = 0;
     ptr->has_best_s3 = 0;
-    ptr->state_pitstop = false;
-    ptr->state_crash = false;
+//    ptr->state_pitstop = false;
+//    ptr->state_crash = false;
 }
 void lap_car(car *ptr){
     //TODO: pit stop / crash all cars pit at same time, no crashing implemented
