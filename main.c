@@ -24,7 +24,23 @@ int help(){
     printf("circuit :\n");
     printf("circuit is for sprint or final and determines the number of turns the cars have to complete.\n");
 
-    return 0;
+    exit(0);
+}
+
+void rearrange(car *list, int car_count){
+    //TODO: optimise
+    car buffer;
+    int count, count2;
+
+    for(count = 0; count < car_count; count++){
+        for(count2 = 0; count2 < car_count; count2++){
+            if(list[count2].id > list[count].id){
+                buffer = list[count];
+                list[count] = list[count2];
+                list[count2] = buffer;
+            }
+        }
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -36,15 +52,10 @@ int main(int argc, char *argv[]) {
     car * buffer = malloc(total_cars * sizeof(car));
 
     //shared memory
-    shmid = shmget(shmkey, num_cars * sizeof(car), IPC_CREAT | 0666);
-    perror("");
+    shmid = shmget(shmkey, total_cars * sizeof(car), IPC_CREAT | 0666);
     car *circuit = shmat(shmid, 0, 0);
 
-
-    if (argc == 1 || strcmp(argv[1], "-h") == 0) {
-        help();
-    }
-
+    if (argc == 1 || strcmp(argv[1], "-h") == 0) help();
     filename = argv[1];
 
     if (argc == 4 && strcmp(argv[2], "-tryouts") == 0) {
@@ -89,8 +100,9 @@ int main(int argc, char *argv[]) {
         //define condition for race finish
     } else if (strcmp(argv[2], "-final") == 0) {
         int * order;
+        strcat(race_name, "final");
         num_cars = 20;
-        order = get_order(filename, ";", "Q3", num_cars);
+        order = compile_grid(filename);
         for (int i = 0; i < num_cars; i++) {
             init_car(&circuit[i], *(order + i));
         }
@@ -110,7 +122,7 @@ int main(int argc, char *argv[]) {
             srand48(time(0) + child.id);
 
             //printf("[son] pid %d from [parent] pid %d and car id is %d\n", getpid(), getppid(), child.id);
-            for(int j = 0; j < 20; j++){
+            for(int j = 0; j < num_cars ; j++){
                 sleep(1);
                 //circuit[i].s1 = j;
                 lap_car(&circuit[i]);
@@ -122,8 +134,9 @@ int main(int argc, char *argv[]) {
 
     if(cpid != 0){
         halfdelay(5);
+
         for(int i = 0; i < 20; i++) {
-            car * buffer = malloc(num_cars * sizeof(car));
+            buffer = malloc(num_cars * sizeof(car));
             memcpy(buffer,circuit,num_cars * sizeof(car));
             bubble_sort(buffer, num_cars);
             printw("%d\n", i);
@@ -135,19 +148,25 @@ int main(int argc, char *argv[]) {
         }
 
         //sort then write to file
-        memcpy(buffer,circuit,total_cars * sizeof(car));
-        bubble_sort(buffer, total_cars);
-        write_to_file(race_name,filename, mode, ";", total_cars, buffer);
+        memcpy(buffer,circuit,num_cars * sizeof(car));
+        bubble_sort(buffer, num_cars);
+        write_to_file(race_name,filename, mode, ";", num_cars, buffer);
 
         //update best results
-        load_results(filename, ";", "bests", total_cars, buffer);
-        for(int i = 0; i < total_cars; i++){
-            if(circuit[i].best_s1 < buffer[i].best_s1)buffer[i].best_s1 = circuit[i].best_s1;
-            if(circuit[i].best_s2 < buffer[i].best_s2)buffer[i].best_s2 = circuit[i].best_s2;
-            if(circuit[i].best_s3 < buffer[i].best_s3)buffer[i].best_s3 = circuit[i].best_s3;
-            if(circuit[i].best_lap < buffer[i].best_lap)buffer[i].best_lap = circuit[i].best_lap;
-        }
-        write_to_file("bests",filename, "w", ";", total_cars, buffer);
+//        buffer = malloc(total_cars * sizeof(car));
+//        load_results(filename, ";", "bests", total_cars, buffer);
+//
+//        rearrange(buffer, 20);
+//        rearrange(circuit, 20);
+//
+//        for(int i = 0; i < num_cars; i++) {
+//            printf("%d\n", i);
+//            if(circuit[i].best_s1 < buffer[i].best_s1)buffer[i].best_s1 = circuit[i].best_s1;
+//            if(circuit[i].best_s2 < buffer[i].best_s2)buffer[i].best_s2 = circuit[i].best_s2;
+//            if(circuit[i].best_s3 < buffer[i].best_s3)buffer[i].best_s3 = circuit[i].best_s3;
+//            if(circuit[i].best_lap < buffer[i].best_lap)buffer[i].best_lap = circuit[i].best_lap;
+//        }
+//        write_to_file("bests",filename, "w", ";", num_cars, buffer);
 
         //shared memory
         shmctl(shmid, IPC_RMID, NULL);

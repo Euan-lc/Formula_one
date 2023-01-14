@@ -27,3 +27,5 @@ void write_to_file(char* race, char* filename, char* mode, char* separator, int 
 void load_results(char* filename, char* separator, char* race, int num_cars, car* bracket0);
 
 int * get_order(char* filename, char* separator, char* race, int num_cars);
+
+int * compile_grid(char * filename);

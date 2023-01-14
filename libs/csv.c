@@ -21,10 +21,8 @@ void write_to_file(char* race, char* filename, char* mode, char* separator, int 
         fprintf( fpt, "%s", separator);
         fprintf( fpt, "%-5.4g", bracket[i].best_s3);
         fprintf( fpt, "%s", separator);
-        fprintf( fpt, "%-5.4g", bracket[i].best_lap);
-        fprintf( fpt, "\n");
+        fprintf( fpt, "%-5.4g\n", bracket[i].best_lap);
     }
-    fprintf(fpt, "\n");
     fclose( fpt );
 }
 
@@ -104,4 +102,18 @@ int * get_order(char* filename, char* separator, char* race, int num_cars) {
     }
     fclose( fpt );
     return order;
+}
+
+int * compile_grid(char * filename){
+    static int grid[20];
+    int *order;
+
+    order = get_order(filename, ";", "Q1", 20);
+    for (int i = 19; i > 14; --i) grid[i] = order[i];
+    order = get_order(filename, ";", "Q2", 20);
+    for (int i = 14; i > 9; --i) grid[i] = order[i];
+    order = get_order(filename, ";", "Q3", 20);
+    for (int i = 9; i >= 0; --i) grid[i] = order[i];
+    
+    return grid;
 }
