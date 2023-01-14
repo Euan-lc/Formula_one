@@ -35,17 +35,17 @@ int stop_tryouts (int tot, int laps){
 }
 
 int stop_Q1 (int tot, int laps){
-    if(tot>=(18 * 60))return 1;
+    if(tot>=1080)return 1;
     else return 0;
 }
 
 int stop_Q2 (int tot, int laps){
-    if(tot>=(15 * 60))return 1;
+    if(tot>=900)return 1;
     else return 0;
 }
 
 int stop_Q3 (int tot, int laps){
-    if(tot>=(12 * 60))return 1;
+    if(tot>=720)return 1;
     else return 0;
 }
 
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
     char *filename;
     char * mode = "a";
     int num_cars = 20, total_cars = 20;
-    int shmid, semid1, semid2, semid3, cpid, shmkey = 4101, semkey1 = 234, semkey2, semkey3;//ca casse parfois a cause de ca
+    int shmid, semid1, semid2, semid3, cpid, shmkey = 4101, semkey1 = 234, semkey2, semkey3 = 4235;//ca casse parfois a cause de ca
     car * buffer = malloc(total_cars * sizeof(car));
     stop_race_T stop_race_ptr;
     struct sembuf sopw, sopd, sopi;
@@ -87,6 +87,19 @@ int main(int argc, char *argv[]) {
     car *circuit = shmat(shmid, 0, 0);
 
     if (argc == 1 || strcmp(argv[1], "-h") == 0) help();
+    char *types_of_races[] = {"-tryouts", "-qualifiers","-sprint","-final"};
+    int counter_types_of_races, size_types_of_races = sizeof(types_of_races) / sizeof(types_of_races[0]);
+    int flag_in_list = 1;
+    if (argc < 3) help();
+    for (counter_types_of_races = 0; counter_types_of_races < size_types_of_races; counter_types_of_races++){
+        if (strcmp(argv[2], types_of_races[counter_types_of_races]) == 0) {
+            flag_in_list = 0;
+            break;
+        }
+    }
+    if (flag_in_list == 1){
+        help();
+    }
     filename = argv[1];
 
     if (argc == 4 && strcmp(argv[2], "-tryouts") == 0) {
@@ -150,27 +163,25 @@ int main(int argc, char *argv[]) {
             sleep(1);
             semid1 = semget(semkey1, 1, 0);
             semid2 = semget(semkey2, 1, 0);
-//            semid3 = semget(semkey3, 1, 0);
+            semid3 = semget(semkey3, 1, 0);
             //generate seed for rand based on
             srand48(time(0) + child.id);
             semop(semid2, &sopw, 1);
 
             while(lap_car(&circuit[i], stop_race_ptr)){
-//                sleep(1);//change that
-//                printf("%d\n", child.id);
                 semop(semid1, &sopd, 1);
             }
-//            semop(semid3, &sopi, 1);
+            semop(semid3, &sopi, 1);
             exit(0);
         }
     }
 
     if(cpid != 0){
-//        int sem3_val = 0;
+        int sem3_val = 0;
         semid1 = semget(semkey1, 1, IPC_CREAT | 0600);
         semid2 = semget(semkey2, 1, IPC_CREAT | 0600);
-//        semid3 = semget(semkey3, 1, IPC_CREAT | 0600);
-        if(semid1 == -1 || semid2 == -1){
+        semid3 = semget(semkey3, 1, IPC_CREAT | 0600);
+        if(semid1 == -1 || semid2 == -1 || semid3 == -1){
             perror("");
         }
 
@@ -180,15 +191,15 @@ int main(int argc, char *argv[]) {
         set_val.val = 1;
         semctl(semid2, 0, SETVAL, set_val);
 
-//        set_val.val = 0;
-//        semctl(semid3, 0, SETVAL, set_val);
+        set_val.val = 0;
+        semctl(semid3, 0, SETVAL, set_val);
         //display
         initscr();
         start_color();
         init_pair(1,COLOR_MAGENTA, COLOR_BLACK);
         halfdelay(5);
 
-        for(int i = 0; i < 10; i++) {
+        for(int i = 0; i < 40; i++) {
             buffer = malloc(num_cars * sizeof(car));
 
             semop(semid1, &sopw, 1);
@@ -206,10 +217,10 @@ int main(int argc, char *argv[]) {
             getch();
             erase();
             refresh();
-//            sem_getvalue(semid3,&sem3_val);
-//            if(sem3_val == num_cars){
-//                break;
-//            }
+            sem3_val = semctl(semid3, 0, GETVAL);
+            if(sem3_val == num_cars){
+                break;
+            }
         }
 
         //sort then write to file
@@ -239,6 +250,7 @@ int main(int argc, char *argv[]) {
         //semaphore
         semctl(semid1, 0, IPC_RMID);
         semctl(semid2, 0, IPC_RMID);
+        semctl(semid3, 0, IPC_RMID);
 
         //display
         getch();
