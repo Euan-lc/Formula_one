@@ -3,7 +3,7 @@
 
 extern int errno ;
 
-typedef int (*stop_race_T)(int tot);
+typedef int (*stop_race_T)(int tot, int laps);
 
 //TODO: check param validity
 
@@ -29,33 +29,33 @@ int help(){
     exit(0);
 }
 
-int stop_tryouts (int tot){
-    if(tot>=500)return 1;
+int stop_tryouts (int tot, int laps){
+    if(tot>=3600)return 1;
     else return 0;
 }
 
-int stop_Q1 (int tot){
+int stop_Q1 (int tot, int laps){
     if(tot>=(18 * 60))return 1;
     else return 0;
 }
 
-int stop_Q2 (int tot){
+int stop_Q2 (int tot, int laps){
     if(tot>=(15 * 60))return 1;
     else return 0;
 }
 
-int stop_Q3 (int tot){
+int stop_Q3 (int tot, int laps){
     if(tot>=(12 * 60))return 1;
     else return 0;
 }
 
-int stop_final (int laps){
-    if(laps>=20)return 1;
+int stop_final (int tot, int laps){
+    if(laps>=70)return 1;
     else return 0;
 }
 
-int stop_sprint (int laps){
-    if(laps>=20)return 1;
+int stop_sprint (int tot, int laps){
+    if(laps>=30)return 1;
     else return 0;
 }
 
@@ -64,9 +64,23 @@ int main(int argc, char *argv[]) {
     char *filename;
     char * mode = "a";
     int num_cars = 20, total_cars = 20;
-    int shmid, cpid, shmkey = 4101;//ca casse parfois a cause de ca
+    int shmid, semid1, semid2, semid3, cpid, shmkey = 4101, semkey1 = 234, semkey2, semkey3;//ca casse parfois a cause de ca
     car * buffer = malloc(total_cars * sizeof(car));
     stop_race_T stop_race_ptr;
+    struct sembuf sopw, sopd, sopi;
+    union semun set_val;
+
+    sopw.sem_num = 0;
+    sopw.sem_op = 0;
+    sopw.sem_flg = 0;
+
+    sopd.sem_num = 0;
+    sopd.sem_op = -1;
+    sopd.sem_flg = 0;
+
+    sopi.sem_num = 0;
+    sopi.sem_op = 1;
+    sopi.sem_flg = 0;
 
     //shared memory
     shmid = shmget(shmkey, total_cars * sizeof(car), IPC_CREAT | 0666);
@@ -118,8 +132,6 @@ int main(int argc, char *argv[]) {
             }
             stop_race_ptr = stop_Q3;
         }
-
-
     } else if (strcmp(argv[2], "-final") == 0) {
         int * order;
         strcat(race_name, "final");
@@ -131,36 +143,62 @@ int main(int argc, char *argv[]) {
         stop_race_ptr = stop_final;
     }
 
-    //display
-    initscr();
-    start_color();
-    init_pair(1,COLOR_MAGENTA, COLOR_BLACK);
-
     for (int i = 0; i < num_cars; i++) {
         if ((cpid = fork()) == 0) {
             car child;
             child = circuit[i];
-
+            sleep(1);
+            semid1 = semget(semkey1, 1, 0);
+            semid2 = semget(semkey2, 1, 0);
+//            semid3 = semget(semkey3, 1, 0);
             //generate seed for rand based on
             srand48(time(0) + child.id);
+            semop(semid2, &sopw, 1);
 
-            //printf("[son] pid %d from [parent] pid %d and car id is %d\n", getpid(), getppid(), child.id);
-            for(int j = 0; j < num_cars ; j++){
-                sleep(1);
-                //circuit[i].s1 = j;
-                lap_car(&circuit[i], stop_race_ptr);
+            while(lap_car(&circuit[i], stop_race_ptr)){
+//                sleep(1);//change that
+//                printf("%d\n", child.id);
+                semop(semid1, &sopd, 1);
             }
-            //printf("car %d has a lap time of %g\n", child.id, child.total_time);
+//            semop(semid3, &sopi, 1);
             exit(0);
         }
     }
 
     if(cpid != 0){
+//        int sem3_val = 0;
+        semid1 = semget(semkey1, 1, IPC_CREAT | 0600);
+        semid2 = semget(semkey2, 1, IPC_CREAT | 0600);
+//        semid3 = semget(semkey3, 1, IPC_CREAT | 0600);
+        if(semid1 == -1 || semid2 == -1){
+            perror("");
+        }
+
+        set_val.val = num_cars;
+        semctl(semid1, 0, SETVAL, set_val);
+
+        set_val.val = 1;
+        semctl(semid2, 0, SETVAL, set_val);
+
+//        set_val.val = 0;
+//        semctl(semid3, 0, SETVAL, set_val);
+        //display
+        initscr();
+        start_color();
+        init_pair(1,COLOR_MAGENTA, COLOR_BLACK);
         halfdelay(5);
 
-        for(int i = 0; i < 20; i++) {
+        for(int i = 0; i < 10; i++) {
             buffer = malloc(num_cars * sizeof(car));
+
+            semop(semid1, &sopw, 1);
+            set_val.val = 1;
+            semctl(semid2, 0, SETVAL, set_val);
             memcpy(buffer,circuit,num_cars * sizeof(car));
+            set_val.val = num_cars;
+            semctl(semid1, 0, SETVAL, set_val);
+            semop(semid2, &sopd, 1);
+
             bubble_sort(buffer, num_cars);
             printw("%d\n", i);
             display_scores(buffer, num_cars);
@@ -168,6 +206,10 @@ int main(int argc, char *argv[]) {
             getch();
             erase();
             refresh();
+//            sem_getvalue(semid3,&sem3_val);
+//            if(sem3_val == num_cars){
+//                break;
+//            }
         }
 
         //sort then write to file
@@ -193,6 +235,10 @@ int main(int argc, char *argv[]) {
 
         //shared memory
         shmctl(shmid, IPC_RMID, NULL);
+
+        //semaphore
+        semctl(semid1, 0, IPC_RMID);
+        semctl(semid2, 0, IPC_RMID);
 
         //display
         getch();

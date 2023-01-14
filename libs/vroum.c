@@ -33,7 +33,7 @@ void init_car(car *ptr, int carId) {
     ptr->state_pitstop = false;
     ptr->state_crash = false;
 }
-void lap_car(car *ptr, int (*f)(int)){
+int lap_car(car *ptr, int (*f)(int, int)){
     //TODO: pit stop / crash all cars pit at same time, no crashing implemented
     float lap;
  
@@ -50,7 +50,7 @@ void lap_car(car *ptr, int (*f)(int)){
     ptr->total_time = ptr->total_time + lap;
     ptr->num_laps++;
 
-    if((*f)(ptr->total_time)){
-        exit(1);
-    }
+    if((*f)(ptr->total_time, ptr->num_laps)){
+        return 0;
+    }else return 1;
 }
