@@ -18,6 +18,9 @@ float genTime(float lower, float upper) {
 
 void init_car(car *ptr, int carId) {
     ptr->id = carId;
+    ptr->s1 = 45;
+    ptr->s2 = 45;
+    ptr->s3 = 45;
     ptr->best_s1 = 45;//initier a 45 parce que sinon on a une valeur random et 45 est le pire temps possible
     ptr->best_s2 = 45;
     ptr->best_s3 = 45;
@@ -26,8 +29,8 @@ void init_car(car *ptr, int carId) {
     ptr->has_best_s1 = 0;
     ptr->has_best_s2 = 0;
     ptr->has_best_s3 = 0;
-//    ptr->state_pitstop = false;
-//    ptr->state_crash = false;
+    ptr->state_pitstop = false;
+    ptr->state_crash = false;
 }
 void lap_car(car *ptr){
     //TODO: pit stop / crash all cars pit at same time, no crashing implemented

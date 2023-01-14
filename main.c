@@ -5,12 +5,35 @@ extern int errno ;
 
 //TODO: check param validity
 
+int help(){
+    // Print the help message
+    printf("Usage: ./Formula_one [weekend] [race_type] [race_number] [circuit]\n\n");
+
+    printf("  -h     display this help message\n\n");
+
+    printf("weekend is the name of the file which will store the race results, it can be up to 50 characters long\n\n");
+
+    printf("race types :\n");
+    printf("  -tryouts\n");
+    printf("  -qualifiers\n");
+    printf("  -sprint\n");
+    printf("  -final\n\n");
+    printf("race_number :\n");
+    printf("race_number is for tryout and qualifiers and is from 1 to 3\n\n");
+
+    printf("circuit :\n");
+    printf("circuit is for sprint or final and determines the number of turns the cars have to complete.\n");
+
+    return 0;
+}
+
 int main(int argc, char *argv[]) {
     char race_name[10];
     char *filename;
     char * mode = "a";
-    int num_cars = 20;
+    int num_cars = 20, total_cars = 20;
     int shmid, cpid, shmkey = 4101;//ca casse parfois a cause de ca
+    car * buffer = malloc(total_cars * sizeof(car));
 
     //shared memory
     shmid = shmget(shmkey, num_cars * sizeof(car), IPC_CREAT | 0666);
@@ -19,39 +42,24 @@ int main(int argc, char *argv[]) {
 
 
     if (argc == 1 || strcmp(argv[1], "-h") == 0) {
-        // Print the help message
-        printf("Usage: ./Formula_one [weekend] [race_type] [race_number] [num_turns/time]\n\n");
-
-        printf("  -h     display this help message\n\n");
-
-        printf("weekend is the name of the file which will store the race results, it can be up to 50 characters long\n\n");
-
-        printf("race types :\n");
-        printf("  -tryouts\n");
-        printf("  -qualifiers\n");
-        printf("  -sprint\n");
-        printf("  -final\n\n");
-        printf("race_number :\n");
-        printf("race_number is for tryout and qualifiers and is from 1 to 3\n\n");
-
-        printf("num_turns :\n");
-        printf("num_turns is for sprint or final and determines the number of turns the cars have to complete.\n");
-
-        return 0;
+        help();
     }
 
     filename = argv[1];
 
     if (argc == 4 && strcmp(argv[2], "-tryouts") == 0) {
         if (strcmp(argv[3], "1") == 0) {
-            mode = "w";
+            mkdir(filename, 0700);
+            char * path;
+            path = strdup(filename);
+            strcat(path, "/bests.csv");
+            for (int i = 0; i < num_cars; i++) init_car(&buffer[i], carIds[i]);
+            write_to_file("bests", filename, "w", ";", total_cars, buffer);
         }
-        strcat(race_name, "S");
+        strcat(race_name, "P");
         strcat(race_name, argv[3]);
-        printf("i'm here\n");
 
         for (int i = 0; i < num_cars; i++) {
-            printf("i'm here\n");
             init_car(&circuit[i], carIds[i]);
         }
 
@@ -67,18 +75,26 @@ int main(int argc, char *argv[]) {
         } else if(strcmp(race_name, "Q2") == 0){
             num_cars = 15;
             order = get_order(filename, ";", "Q1", num_cars);
-            for (int i = 0; i < num_cars; i++) init_car(&circuit[i], *(order + i));
-            read_from_file(filename, ";", "Q1", 20, circuit, 5);
+            for (int i = 0; i < num_cars; i++) {
+                init_car(&circuit[i], *(order + i));
+            }
         } else if(strcmp(race_name, "Q3") == 0){
             num_cars = 10;
             order = get_order(filename, ";", "Q2", num_cars);
-            for (int i = 0; i < num_cars; i++) init_car(&circuit[i], *(order + i));
-            read_from_file(filename, ";", "Q1", 20, circuit, 5);
+            for (int i = 0; i < num_cars; i++) {
+                init_car(&circuit[i], *(order + i));
+            }
         }
 
         //define condition for race finish
+    } else if (strcmp(argv[2], "-final") == 0) {
+        int * order;
+        num_cars = 20;
+        order = get_order(filename, ";", "Q3", num_cars);
+        for (int i = 0; i < num_cars; i++) {
+            init_car(&circuit[i], *(order + i));
+        }
     }
-    printf("i'm here\n");
 
     //display
     initscr();
@@ -118,7 +134,20 @@ int main(int argc, char *argv[]) {
             refresh();
         }
 
-        write_to_file(race_name,filename, mode, ";", num_cars, circuit);
+        //sort then write to file
+        memcpy(buffer,circuit,total_cars * sizeof(car));
+        bubble_sort(buffer, total_cars);
+        write_to_file(race_name,filename, mode, ";", total_cars, buffer);
+
+        //update best results
+        load_results(filename, ";", "bests", total_cars, buffer);
+        for(int i = 0; i < total_cars; i++){
+            if(circuit[i].best_s1 < buffer[i].best_s1)buffer[i].best_s1 = circuit[i].best_s1;
+            if(circuit[i].best_s2 < buffer[i].best_s2)buffer[i].best_s2 = circuit[i].best_s2;
+            if(circuit[i].best_s3 < buffer[i].best_s3)buffer[i].best_s3 = circuit[i].best_s3;
+            if(circuit[i].best_lap < buffer[i].best_lap)buffer[i].best_lap = circuit[i].best_lap;
+        }
+        write_to_file("bests",filename, "w", ";", total_cars, buffer);
 
         //shared memory
         shmctl(shmid, IPC_RMID, NULL);

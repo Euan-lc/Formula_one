@@ -2,10 +2,15 @@
 
 void write_to_file(char* race, char* filename, char* mode, char* separator, int num_cars, car *bracket) {
     FILE *fpt;
+    char * path;
+    path = strdup(filename);
+    strcat(path, "/");
+    strcat(path, race);
+    strcat(path, ".csv");
 
-    fpt = fopen(filename, mode);
+    fpt = fopen(path, mode);
 
-    fprintf(fpt,"%s\nid%s best s1%s best s2 %s best s3 %s best lap%s total time\n",race, separator, separator, separator, separator, separator);
+    fprintf(fpt,"%s\nid%s best s1%s best s2 %s best s3 %s best lap\n",race, separator, separator, separator, separator);
 
     for (int i = 0; i < num_cars; i++) {
         fprintf( fpt, "%2d", bracket[i].id);
@@ -17,8 +22,6 @@ void write_to_file(char* race, char* filename, char* mode, char* separator, int 
         fprintf( fpt, "%-5.4g", bracket[i].best_s3);
         fprintf( fpt, "%s", separator);
         fprintf( fpt, "%-5.4g", bracket[i].best_lap);
-        fprintf( fpt, "%s", separator);
-        fprintf( fpt, "%-5.4g", bracket[i].total_time);
         fprintf( fpt, "\n");
     }
     fprintf(fpt, "\n");
@@ -27,6 +30,8 @@ void write_to_file(char* race, char* filename, char* mode, char* separator, int 
 
 void fill_car(char line[], char* separator, car *temp) {
     const char* tok;
+
+    init_car(temp, 0);
 
     tok = strtok(line, separator);
     temp->id = atoi(tok);
@@ -38,25 +43,20 @@ void fill_car(char line[], char* separator, car *temp) {
     temp->best_s3 = atof(tok);
     tok = strtok(NULL, separator);
     temp->best_lap = atof(tok);
-    tok = strtok(NULL, separator);
-    temp->total_time = atof(tok);
-
-    temp->s1 = 0;
-    temp->s2 = 0;
-    temp->s3 = 0;
-    temp->has_best_s1 = 0;
-    temp->has_best_s2 = 0;
-    temp->has_best_s3 = 0;
-    temp->state_pitstop = false;
-    temp->state_crash = false;
 }
 
-void read_from_file(char* filename, char* separator, char* race, int num_cars, car* bracket, int skip) {
+void load_results(char* filename, char* separator, char* race, int num_cars, car* bracket) {
     FILE *fpt;
     char line[1024];
     car test;
+    char * path;
 
-    fpt = fopen(filename, "r");
+    path = strdup(filename);
+    strcat(path, "/");
+    strcat(path, race);
+    strcat(path, ".csv");
+
+    fpt = fopen(path, "r");
 
     while(fgets(line, 1024, fpt)){
         char* tmp = strdup(line);
@@ -67,15 +67,12 @@ void read_from_file(char* filename, char* separator, char* race, int num_cars, c
         }
     }
 
-    for(int i =0; i < skip; i++){
-        fgets(line, 1024, fpt);
-    }
-
-    for(int i = skip; i < num_cars ; i++){
+    for(int i = 0; i < num_cars ; i++){
         fgets(line, 1024, fpt);
         fill_car(line, separator, &test);
         bracket[i] = test;
     }
+
     fclose( fpt );
 }
 
@@ -83,9 +80,13 @@ int * get_order(char* filename, char* separator, char* race, int num_cars) {
     static int  order[20];
     FILE *fpt;
     char line[1024];
+    char * path;
+    path = strdup(filename);
+    strcat(path, "/");
+    strcat(path, race);
+    strcat(path, ".csv");
 
-
-    fpt = fopen(filename, "r");
+    fpt = fopen(path, "r");
 
     while(fgets(line, 1024, fpt)){
         char* tmp = strdup(line);

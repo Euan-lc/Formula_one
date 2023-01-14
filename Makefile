@@ -11,7 +11,7 @@ clean:
 	rm -f sort.o
 	rm -f csv.o
 	rm -f circuit
-	rm -f test.csv
+	rm -f *.csv
 menu: libs/f1.h menu.c libs/csv.c libs/vroum.c
 	gcc libs/vroum.c -c
 	gcc libs/csv.c -c
