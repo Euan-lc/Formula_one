@@ -3,6 +3,8 @@
 
 extern int errno ;
 
+typedef int (*stop_race_T)(int tot);
+
 //TODO: check param validity
 
 int help(){
@@ -27,20 +29,34 @@ int help(){
     exit(0);
 }
 
-void rearrange(car *list, int car_count){
-    //TODO: optimise
-    car buffer;
-    int count, count2;
+int stop_tryouts (int tot){
+    if(tot>=500)return 1;
+    else return 0;
+}
 
-    for(count = 0; count < car_count; count++){
-        for(count2 = 0; count2 < car_count; count2++){
-            if(list[count2].id > list[count].id){
-                buffer = list[count];
-                list[count] = list[count2];
-                list[count2] = buffer;
-            }
-        }
-    }
+int stop_Q1 (int tot){
+    if(tot>=(18 * 60))return 1;
+    else return 0;
+}
+
+int stop_Q2 (int tot){
+    if(tot>=(15 * 60))return 1;
+    else return 0;
+}
+
+int stop_Q3 (int tot){
+    if(tot>=(12 * 60))return 1;
+    else return 0;
+}
+
+int stop_final (int laps){
+    if(laps>=20)return 1;
+    else return 0;
+}
+
+int stop_sprint (int laps){
+    if(laps>=20)return 1;
+    else return 0;
 }
 
 int main(int argc, char *argv[]) {
@@ -50,6 +66,7 @@ int main(int argc, char *argv[]) {
     int num_cars = 20, total_cars = 20;
     int shmid, cpid, shmkey = 4101;//ca casse parfois a cause de ca
     car * buffer = malloc(total_cars * sizeof(car));
+    stop_race_T stop_race_ptr;
 
     //shared memory
     shmid = shmget(shmkey, total_cars * sizeof(car), IPC_CREAT | 0666);
@@ -75,6 +92,8 @@ int main(int argc, char *argv[]) {
         }
 
         //define condition for race finish
+        stop_race_ptr = stop_tryouts;
+
     } else if (argc == 4 && strcmp(argv[2], "-qualifiers") == 0) {
         int *order;
 
@@ -83,21 +102,24 @@ int main(int argc, char *argv[]) {
         if(strcmp(race_name, "Q1") == 0) {
             num_cars = 20;
             for (int i = 0; i < num_cars; i++) init_car(&circuit[i], carIds[i]);
+            stop_race_ptr = stop_Q1;
         } else if(strcmp(race_name, "Q2") == 0){
             num_cars = 15;
             order = get_order(filename, ";", "Q1", num_cars);
             for (int i = 0; i < num_cars; i++) {
                 init_car(&circuit[i], *(order + i));
             }
+            stop_race_ptr = stop_Q2;
         } else if(strcmp(race_name, "Q3") == 0){
             num_cars = 10;
             order = get_order(filename, ";", "Q2", num_cars);
             for (int i = 0; i < num_cars; i++) {
                 init_car(&circuit[i], *(order + i));
             }
+            stop_race_ptr = stop_Q3;
         }
 
-        //define condition for race finish
+
     } else if (strcmp(argv[2], "-final") == 0) {
         int * order;
         strcat(race_name, "final");
@@ -106,6 +128,7 @@ int main(int argc, char *argv[]) {
         for (int i = 0; i < num_cars; i++) {
             init_car(&circuit[i], *(order + i));
         }
+        stop_race_ptr = stop_final;
     }
 
     //display
@@ -125,7 +148,7 @@ int main(int argc, char *argv[]) {
             for(int j = 0; j < num_cars ; j++){
                 sleep(1);
                 //circuit[i].s1 = j;
-                lap_car(&circuit[i]);
+                lap_car(&circuit[i], stop_race_ptr);
             }
             //printf("car %d has a lap time of %g\n", child.id, child.total_time);
             exit(0);

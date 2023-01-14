@@ -18,7 +18,7 @@ float genTime(float lower, float upper);
 
 void init_car(car *ptr, int carId);
 
-void lap_car(car *ptr);
+void lap_car(car *ptr, int (*f)(int));
 
 void display_scores(car *circuit, int car_count);
 

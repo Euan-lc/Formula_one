@@ -114,6 +114,6 @@ int * compile_grid(char * filename){
     for (int i = 14; i > 9; --i) grid[i] = order[i];
     order = get_order(filename, ";", "Q3", 20);
     for (int i = 9; i >= 0; --i) grid[i] = order[i];
-    
+
     return grid;
 }

@@ -26,13 +26,14 @@ void init_car(car *ptr, int carId) {
     ptr->best_s3 = 45;
     ptr->best_lap = 45 * 3;
     ptr->total_time = 0;
+    ptr->num_laps = 0;
     ptr->has_best_s1 = 0;
     ptr->has_best_s2 = 0;
     ptr->has_best_s3 = 0;
     ptr->state_pitstop = false;
     ptr->state_crash = false;
 }
-void lap_car(car *ptr){
+void lap_car(car *ptr, int (*f)(int)){
     //TODO: pit stop / crash all cars pit at same time, no crashing implemented
     float lap;
  
@@ -47,4 +48,9 @@ void lap_car(car *ptr){
     if(ptr->s3 < ptr->best_s3)ptr->best_s3 = ptr->s3;
     if(lap < ptr->best_lap)ptr->best_lap = lap;
     ptr->total_time = ptr->total_time + lap;
+    ptr->num_laps++;
+
+    if((*f)(ptr->total_time)){
+        exit(1);
+    }
 }
